@@ -1,7 +1,78 @@
-import { Box, Button, Checkbox, TextField, Typography } from "@mui/material";
-import React from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import React, { useState } from "react";
+import CheckBox from "./CheckBox";
 
 const GeneratorPage = () => {
+  const [password, setPassword] = useState({
+    length: 5,
+    uppercase: false,
+    lowercase: false,
+    numbers: false,
+    symbols: false,
+  });
+  const [handleText, setHandleText] = useState("");
+  const [copied, setCopied] = useState(false);
+  const handleChangeUppercase = () => {
+    setPassword({
+      ...password,
+      uppercase: !password.uppercase,
+    });
+  };
+  const handleChangeLowercase = () => {
+    setPassword({
+      ...password,
+      lowercase: !password.lowercase,
+    });
+  };
+  const handleChangeNumbers = () => {
+    setPassword({
+      ...password,
+      numbers: !password.numbers,
+    });
+  };
+  const handleChangeSymbols = () => {
+    setPassword({
+      ...password,
+      symbols: !password.symbols,
+    });
+  };
+  const setPasswordLength = (val) => {
+    setPassword({
+      ...password,
+      length: val,
+    });
+  };
+  function generatePassword() {
+    const numbersArray = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const symbolsArray = ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")"];
+    const characterCodes = Array.from(Array(26)).map((_e, i) => i + 97);
+    const lowerCaseLetters = characterCodes.map((letter) =>
+      String.fromCharCode(letter)
+    );
+    const upperCaseLetters = lowerCaseLetters.map((letter) =>
+      letter.toUpperCase()
+    );
+    const { length, uppercase, lowercase, numbers, symbols } = password;
+    const generateTheWord = (
+      length,
+      uppercase,
+      lowercase,
+      numbers,
+      symbols
+    ) => {
+      const avaiableCharacters = [
+        ...(uppercase ? upperCaseLetters : []),
+        ...(lowercase ? lowerCaseLetters : []),
+        ...(numbers ? numbersArray : []),
+        ...(symbols ? symbolsArray : []),
+      ];
+      const shuffleArray = (array) => array.sort(() => Math.random() - 0.5);
+      const characters = shuffleArray(avaiableCharacters).slice(0, length);
+      setHandleText(characters.join(""));
+      return characters;
+    };
+    generateTheWord(length, uppercase, lowercase, numbers, symbols);
+  }
   return (
     <>
       <Box
@@ -26,7 +97,13 @@ const GeneratorPage = () => {
           </Typography>
           <Box sx={{ display: "flex", justifyContent: "space-around", mt: 2 }}>
             <Box>
-              <TextField size="small" fullWidth sx={{ width: "100%" }} />
+              <TextField
+                size="small"
+                fullWidth
+                value={handleText}
+                sx={{ width: "100%" }}
+                onChange={(e) => setHandleText(e.target.value)}
+              />
             </Box>
             <Box>
               <Button
@@ -44,8 +121,17 @@ const GeneratorPage = () => {
                     color: "rgba(48, 226, 12,1)",
                   },
                 }}
+                onClick={() => {
+                  if (handleText.length > 0) {
+                    navigator.clipboard.writeText(handleText);
+                    setCopied(true);
+                    setInterval(() => {
+                      setCopied(false);
+                    }, 20000);
+                  }
+                }}
               >
-                Copy Text
+                {copied ? "copied!" : "Copy Text"}
               </Button>
             </Box>
           </Box>
@@ -54,7 +140,13 @@ const GeneratorPage = () => {
               <Typography sx={{ fontWeight: 600 }}>Password Length</Typography>
             </Box>
             <Box>
-              <TextField size="small" sx={{ width: 60 }} />
+              <TextField
+                type="number"
+                size="small"
+                value={password.length}
+                sx={{ width: 60 }}
+                onChange={(e) => setPasswordLength(e.target.value)}
+              />
             </Box>
           </Box>
 
@@ -65,7 +157,10 @@ const GeneratorPage = () => {
               </Typography>
             </Box>
             <Box>
-              <Checkbox />
+              <CheckBox
+                value={password.uppercase}
+                onChange={handleChangeUppercase}
+              />
             </Box>
           </Box>
 
@@ -76,7 +171,10 @@ const GeneratorPage = () => {
               </Typography>
             </Box>
             <Box>
-              <Checkbox />
+              <CheckBox
+                value={password.lowercase}
+                onChange={handleChangeLowercase}
+              />
             </Box>
           </Box>
 
@@ -85,7 +183,10 @@ const GeneratorPage = () => {
               <Typography sx={{ fontWeight: 600 }}>Include numbers</Typography>
             </Box>
             <Box>
-              <Checkbox />
+              <CheckBox
+                value={password.numbers}
+                onChange={handleChangeNumbers}
+              />
             </Box>
           </Box>
 
@@ -94,7 +195,10 @@ const GeneratorPage = () => {
               <Typography sx={{ fontWeight: 600 }}>Include symbols</Typography>
             </Box>
             <Box>
-              <Checkbox />
+              <CheckBox
+                value={password.symbols}
+                onChange={handleChangeSymbols}
+              />
             </Box>
           </Box>
           <Box>
@@ -116,6 +220,7 @@ const GeneratorPage = () => {
                   color: "rgba(48, 226, 12,1)",
                 },
               }}
+              onClick={generatePassword}
             >
               Generate password
             </Button>
