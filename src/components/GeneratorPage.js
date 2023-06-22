@@ -1,7 +1,8 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import React, { useState } from "react";
 import CheckBox from "./CheckBox";
-
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import AssignmentTurnedInIcon from "@mui/icons-material/AssignmentTurnedIn";
 const GeneratorPage = () => {
   const [password, setPassword] = useState({
     length: 5,
@@ -101,7 +102,7 @@ const GeneratorPage = () => {
                 size="small"
                 fullWidth
                 value={handleText}
-                sx={{ width: "100%" }}
+                sx={{ width: "100%", mt: 1 }}
                 onChange={(e) => setHandleText(e.target.value)}
               />
             </Box>
@@ -131,7 +132,11 @@ const GeneratorPage = () => {
                   }
                 }}
               >
-                {copied ? "copied!" : "Copy Text"}
+                {copied ? (
+                  <AssignmentTurnedInIcon sx={{ mt: 1 }} />
+                ) : (
+                  <AssignmentIcon sx={{ mt: 1 }} />
+                )}
               </Button>
             </Box>
           </Box>
